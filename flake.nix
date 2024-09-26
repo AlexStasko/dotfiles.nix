@@ -13,6 +13,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     astasko-nvim.url = "github:AlexStasko/nvim";
+    _1password-shell-plugins.url = "github:1Password/shell-plugins";
   };
 
   outputs = {

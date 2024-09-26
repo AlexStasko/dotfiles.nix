@@ -9,6 +9,10 @@
   isDarwin = system == "aarch64-darwin" || system == "x86_64-darwin";
   system = pkgs.system;
 in {
+  imports = [
+    inputs._1password-shell-plugins.hmModules.default
+  ];
+
   home.stateVersion = "24.05";
 
   nixpkgs = {
@@ -24,34 +28,29 @@ in {
       LC_ALL = "en_US.UTF-8";
       LC_CTYPE = "en_US.UTF-8";
       PATH = "$GOPATH/bin:$PATH";
+      SSH_AUTH_SOCK = "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock";
       DOCS_HOME = "$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/second-brain";
     };
 
     packages = with pkgs; [
-      _1password
-      _1password-gui
-      arc-browser
-      awscli2
-      discord
       doppler
       fd
       gh
+      glab
       hey
-      httpie
       jq
       k9s
       kubectl
       kubernetes-helm
+      podman
       ripgrep
       rustup
+      ssm-session-manager-plugin
       tenv
       terraform-docs
       tfsec
       tldr
       yq
-      raycast
-      spotify
-      slack
     ];
 
     file = {
@@ -77,7 +76,7 @@ in {
         config.window_background_opacity = 0.8
         config.macos_window_background_blur = 10
 
-        config.default_prog = { 'zsh', '-c', 'exec ${config.home.profileDirectory}/bin/tmux' }
+        config.default_prog = { 'zsh', '-c', '${config.home.profileDirectory}/bin/tmux attach || exec ${config.home.profileDirectory}/bin/tmux' }
         config.enable_tab_bar = false
 
         return config
@@ -133,7 +132,8 @@ in {
         pull.rebase = true;
         commit.gpgsign = true;
         gpg.format = "ssh";
-        user.signingkey = "~/.ssh/id_rsa";
+        user.signingkey = "key::ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCxvcyf5PZ8RxO5AYbpdvo35i3FDLIRBZF1sYHx8qkGxGJDsaeQ0uGTq7VDMrJBbBg7N7z1y7FFfEaLVx4dkY0dRK3zRfbvMzqStLDH+PYgqXqekc10g7QknVLr2M5FRZPIPzAMDnXXLLZQZbJg7k5ynvKRXYFWVsTB4VQh8EapE38twMnG1FzGi2DrKR79NKnfNqnR880tdlMYNclIc7bITRyenGH05OFxQ16kbl1+dZ4qZzozXFFl0G3pRgYcdb11XQa1bw6+Hf3MEW5xD+FZdflwsOM7YElswa8bE89WXZrAZ6eSV3f3pifVPGfnSAYY/NG3mVWWhdaD/5l2g8V6Zhz80rFylDhI91OABAKChIi4yFcR9yTOUKY3u8PA67nFigWKDsVqZSqrWanGVMb8JNDRUOyvSkQBhJ6oSSb7kfQCAq+A+uU0UcTiH0yp/1WpV+xpfro0yvgHoen6+39APP44dheStE0Sc7bFCa1trgvjhdNtytfr11q+y+5zJpK8bNyr+5VLW35xEbLnIM6zeTtvx5OsQXrCQTlUpBVisVpPKxbSjQtyPnX0g6Oj06jA01dZa3sEewAhX8SBy9RZfWULsXnZV5Q6iGU/eHidhKLY05Le6dLlyrjDRifyA4qHiHHjYF0sL83VkwGio+zcvhK8mr+LKTV6sNG47fIl0Q==";
+        gpg.ssh.program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
       };
 
       delta = {
@@ -309,6 +309,11 @@ in {
       syntaxHighlighting = {
         enable = true;
       };
+    };
+
+    _1password-shell-plugins = {
+      enable = true;
+      plugins = with pkgs; [gh awscli2 glab snyk];
     };
   };
 
