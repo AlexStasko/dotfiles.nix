@@ -284,6 +284,15 @@ in {
           nvim .
           popd
         }
+        flakify() {
+          if [ ! -e flake.nix ]; then
+            nix flake new -t github:nix-community/nix-direnv .
+          elif [ ! -e .envrc ]; then
+            echo "use flake" > .envrc
+            direnv allow
+          fi
+          ${EDITOR:-vim} flake.nix
+        }
       '';
 
       oh-my-zsh = {
@@ -313,8 +322,29 @@ in {
 
     _1password-shell-plugins = {
       enable = true;
-      plugins = with pkgs; [gh awscli2 glab snyk];
+      plugins = with pkgs; [
+        gh
+        awscli2
+        glab
+        snyk
+      ];
     };
+
+    # ssh = {
+    #   enable = true;
+    #   forwardAgent = true;
+    #   serverrAliveInterval = 60;
+
+    #   extraConfig = ''
+    #     IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+    #   '';
+
+    #   matchBlocks = {
+    #     "i-* mi-*" = {
+    #       proxyCommand = "sh -c \"aws ssm start-session --target %h --document-name AWS-StartSSHSession --parameters 'portNumber=%p'\"";
+    #     };
+    #   };
+    # };
   };
 
   # security.pam.enableSudoTouchIdAuth = true;
