@@ -106,6 +106,11 @@ in {
     direnv = {
       enable = true;
       enableZshIntegration = true;
+      config = {
+        whitelist.prefix = [
+          "$HOME/work/"
+        ];
+      };
       nix-direnv.enable = true;
     };
 
