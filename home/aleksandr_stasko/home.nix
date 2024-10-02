@@ -46,9 +46,6 @@ in {
       ripgrep
       rustup
       ssm-session-manager-plugin
-      tenv
-      terraform-docs
-      tfsec
       tldr
       yq
     ];
