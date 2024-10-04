@@ -35,6 +35,7 @@ in {
     packages = with pkgs; [
       doppler
       fd
+      gawk
       gh
       glab
       hey
@@ -287,16 +288,44 @@ in {
           popd
         }
         flakify() {
+          NIX_CONFIG="extra-access-tokens = github.com=$(op read op://Personal/GitHub/Token)"
           if [ ! -e flake.nix ]; then
             nix flake new -t github:nix-community/nix-direnv .
           elif [ ! -e .envrc ]; then
             echo "use flake" > .envrc
             direnv allow
           fi
-          ${EDITOR:-vim} flake.nix
+          ''${EDITOR:-vim} flake.nix
+        }
+        set-aws() {
+          read ACCESS_KEY SECRET_ACCESS_KEY SESSION_TOKEN <<< \
+            $(aws sts assume-role \
+              --role-arn $(op read "op://Burberry/BB AWS Default/config/$1") \
+              --role-session-name $(op read "op://Burberry/BB AWS Default/config/session name") \
+              --output text \
+              | awk '/^CREDENTIALS/ { print $2, $4, $5 }')
+          export AWS_ACCESS_KEY_ID=$ACCESS_KEY
+          export AWS_SECRET_ACCESS_KEY=$SECRET_ACCESS_KEY
+          export AWS_SESSION_TOKEN=$SESSION_TOKEN
+          export AWS_DEFAULT_REGION=''${2:-eu-west-1}
+          export AWS_PROFILE=$2
         }
       '';
 
+      # set-aws() {
+      #   read ACCESS_KEY SECRET_ACCESS_KEY SESSION_TOKEN <<< \
+      #     $(AWS_ACCESS_KEY_ID=$(op read "op://Burberry/BB AWS Default/access key id") \
+      #       AWS_SECRET_ACCESS_KEY=$(op read "op://Burberry/BB AWS Default/secret access key") \
+      #       aws sts assume-role \
+      #       --role-arn $(op read "op://Burberry/BB AWS Default/config/non-prod-api") \
+      #       --role-session-name $(op read "op://Burberry/BB AWS Default/config/session name") \
+      #       --output text \
+      #       | awk '/^CREDENTIALS/ { print $2, $4, $5 }')
+      #   export AWS_ACCESS_KEY_ID=$ACCESS_KEY
+      #   export AWS_SECRET_ACCESS_KEY=$SECRET_ACCESS_KEY
+      #   export AWS_SESSION_TOKEN=$SESSION_TOKEN
+      #   export AWS_DEFAULT_REGION=''${1:-eu-west-1}
+      # }
       oh-my-zsh = {
         enable = true;
         plugins = ["git" "z" "aws"];
