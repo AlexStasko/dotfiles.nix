@@ -48,7 +48,9 @@ in {
       rustup
       ssm-session-manager-plugin
       tldr
+      tenv
       yq
+      nodejs_20
     ];
 
     file = {

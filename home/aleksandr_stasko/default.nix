@@ -13,6 +13,9 @@ in {
 
   homebrew = {
     enable = true;
+    onActivation = {
+      upgrade = true;
+    };
     casks = [
       "1password"
       "arc"
@@ -29,6 +32,7 @@ in {
       "spotify"
       "telegram"
       "vlc"
+      "logi-options+"
     ];
   };
 
